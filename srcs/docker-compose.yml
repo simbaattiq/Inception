@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  wordpress:
+    build: ./requirements/wordpress
+    ports:
+      - "8000:80"
+    depends_on:
+      - mariadb
+    volumes:
+      - wp-vol:/var/app/data
+      # - mariadb_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: always
+
+
+
+  mariadb:
+    build: ./requirements/mariadb
+    ports:
+      - "1337:42"
+    depends_on:
+      - nginx
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: always
+
+
+  
+  nginx:
+    build: ./requirements/nginx
+    ports:
+      - "3306:3306"
+    volumes:
+      - wd-vol:/var/nginx/data
+    restart: always
+volumes:
+  mariadb_data:
+  wd-vol:
+networks:
+  my-network:
+    - driver: bridge
