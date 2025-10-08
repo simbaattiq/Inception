@@ -6,3 +6,32 @@ alpine 3.22
 Your volumes will be available in the /home/login/data folder
 
 
+    
+    ## Step 8: Host Configuration
+    
+    ### Configure domain in VM:
+    ```bash
+    sudo nano /etc/hosts
+    ```
+    Add (replace 'login' with your 42 login):
+    ```
+    127.0.0.1 login.42.fr
+    ```
+    
+    ### Create data directories:
+    ```bash
+    sudo mkdir -p /home/$USER/data/mariadb
+    sudo mkdir -p /home/$USER/data/wordpress
+    sudo chown -R $USER:$USER /home/$USER/data
+    ```
+    
+    ## Key Points for Evaluation:
+    
+    1. **Image names match service names** (mariadb, wordpress, nginx)
+    2. **Volumes mounted to `/home/login/data/`** (visible in `docker-compose ps`)
+    3. **Each container has only its intended service**
+    4. **NGINX serves HTTPS with SSL certificate**
+    5. **WordPress connects to MariaDB**
+    6. **No complex initialization scripts**
+    
+    This approach focuses on simplicity and meeting the exact evaluation criteria rather than over-engineering the setup.

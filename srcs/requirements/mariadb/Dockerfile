@@ -1,25 +1,12 @@
-FROM ubuntu:bookworm-slim
 
-RUN RUN apt-get update && \
-    apt-get install -y --no-install-recommends mariadb-server=1:10.11.* && \
-    rm -rf /var/lib/apt/lists/*
+FROM debian:bullseye
 
-# Create MySQL data directory and fix permissions
-RUN mkdir -p /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql
+RUN apt-get update && apt-get install -y \
+    mariadb-server \
+    && rm -rf /var/lib/apt/lists/*
 
-EXPOSE  3306
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 
-COPY ./conf/my.cnf /etc/mysql/my.cnf
+EXPOSE 3306
 
-CMD ["mysqld", "--defaults-file=/etc/mysql/my.cnf"]
-
-WORKDIR /data/app/mariaDb
-
-ENV ../../.env
-
-# HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost:8080/health || exit 1
-
-RUN adduser --disabled-password appuser
-USER appuser
-
-CMD ["bla bla", "bla lba"]
+CMD ["mysqld"]
