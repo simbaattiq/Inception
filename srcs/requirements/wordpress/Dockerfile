@@ -1,6 +1,5 @@
 FROM debian:bullseye
     
-# Install PHP-FPM and WordPress dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     php7.4-fpm \
@@ -16,18 +15,15 @@ RUN apt-get update && apt-get install -y \
     mariadb-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Download WordPress
 WORKDIR /var/www/html
 RUN wget https://wordpress.org/latest.tar.gz && \
     tar -xzf latest.tar.gz && \
     cp -R wordpress/* . && \
     rm -rf wordpress latest.tar.gz
 
-# Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
-# Copy PHP-FPM configuration
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 EXPOSE 9000
