@@ -1,69 +1,62 @@
-
-    services:
-      mariadb:
-        build: ./requirements/mariadb
-        container_name: mariadb
-        restart: always
-        environment:
-          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-          MYSQL_DATABASE: ${MYSQL_DATABASE}
-          MYSQL_USER: ${MYSQL_USER}
-          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-        volumes:
-          - mariadb_data:/var/lib/mysql
-        networks:
-          - inception
-    
-      wordpress:
-        build: ./requirements/wordpress
-        container_name: wordpress
-        restart: always
-        environment:
-          MYSQL_DATABASE: ${MYSQL_DATABASE}
-          MYSQL_USER: ${MYSQL_USER}
-          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-          WP_ADMIN_USER: ${WP_ADMIN_USER}
-          WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
-          WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
-          WP_USER: ${WP_USER}
-          WP_USER_PASSWORD: ${WP_USER_PASSWORD}
-          WP_USER_EMAIL: ${WP_USER_EMAIL}
-          DOMAIN_NAME: ${DOMAIN_NAME}
-        volumes:
-          - wordpress_data:/var/www/html
-        networks:
-          - inception
-        depends_on:
-          - mariadb
-    
-      nginx:
-        build: ./requirements/nginx
-        container_name: nginx
-        restart: always
-        ports:
-          - "443:443"
-        volumes:
-          - wordpress_data:/var/www/html
-        networks:
-          - inception
-        depends_on:
-          - wordpress
-    
-    volumes:
-      mariadb_data:
-        driver: local
-        driver_opts:
-          type: none
-          o: bind
-          device: /home/${USER}/data/mariadb
-    
-      wordpress_data:
-        driver: local
-        driver_opts:
-          type: none
-          o: bind
-          device: /home/${USER}/data/wordpress
-    
+services:
+  mariadb:
+    container_name: mariadb
     networks:
-      inception:
-        driver: bridge
+      - inception
+    build: ./requirements/mariadb
+    image: mariadb:notlatest
+    env_file: .env
+    volumes:
+      - mariadb:/var/lib/mysql
+    restart: always
+    expose:
+      - "3306"
+
+  nginx:
+    container_name: nginx
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+    build: ./requirements/nginx
+    image: nginx:notlatest
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    restart: always
+    ports:
+      - "443:443"
+
+  wordpress:
+    container_name: wordpress
+    networks:
+      - inception
+    depends_on:
+      - mariadb
+    build: ./requirements/wordpress
+    image: wordpress:notlatest
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    restart: always
+    expose:
+      - "9000"
+
+volumes:
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/mel-atti/data/mariadb
+      o: bind
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/mel-atti/data/wordpress
+      o: bind
+
+networks:
+  inception:
+    name: inception
+    driver: bridge

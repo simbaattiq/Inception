@@ -1,18 +1,23 @@
+DIR="./srcs/docker-compose.yml"
+
 all: up
-    
+
 up:
 	mkdir -p /home/${USER}/data/mariadb
 	mkdir -p /home/${USER}/data/wordpress
-	docker-compose -f srcs/docker-compose.yml up -d --build
-
-down:
-	docker-compose -f srcs/docker-compose.yml down
+	sudo chown -R 101:101 /home/mel-atti/data/mariadb
+	sudo chown -R 33:33 /home/mel-atti/data/wordpress
+	@docker compose -f $(DIR) up --build -d
 
 clean: down
-	docker system prune -af
+
+down:
+	@docker compose -f $(DIR) down
 
 fclean: clean
-	sudo rm -rf /home/${USER}/data
+	@docker system prune -af
+# 	sudo rm -rf /home/${USER}/data
+# 	sudo rm -rf /home/${USER}/data/wordpress
 
 re: fclean all
 

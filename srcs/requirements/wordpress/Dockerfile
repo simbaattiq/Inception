@@ -1,31 +1,12 @@
 FROM debian:bullseye
-    
-RUN apt-get update && apt-get install -y \
-    wget \
-    php7.4-fpm \
-    php7.4-mysql \
-    php7.4-curl \
-    php7.4-gd \
-    php7.4-intl \
-    php7.4-mbstring \
-    php7.4-soap \
-    php7.4-xml \
-    php7.4-xmlrpc \
-    php7.4-zip \
-    mariadb-client \
-    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /var/www/html
-RUN wget https://wordpress.org/latest.tar.gz && \
-    tar -xzf latest.tar.gz && \
-    cp -R wordpress/* . && \
-    rm -rf wordpress latest.tar.gz
-
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+RUN apt update -y && apt upgrade -y && \
+    apt install -y curl php7.4 php-fpm php-mysql mariadb-client && \
+    apt clean && rm -rf /var/lib/apt/lists/*
 
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
-EXPOSE 9000
+COPY tools/wordpress.sh /usr/local/bin/wordpress.sh
+RUN chmod +x /usr/local/bin/wordpress.sh
 
-CMD ["php-fpm7.4", "-F"]
+CMD ["/usr/local/bin/wordpress.sh"]
