@@ -4,10 +4,12 @@ services:
     networks:
       - inception
     build: ./requirements/mariadb
-    image: mariadb:notlatest
+    image: mariadb:custom
     env_file: .env
     volumes:
       - mariadb:/var/lib/mysql
+      - /home/mel-atti/secrets/db_root_password.txt:/run/secrets/db_root_password
+      - /home/mel-atti/secrets/db_password.txt:/run/secrets/db_password
     restart: always
     expose:
       - "3306"
@@ -19,7 +21,7 @@ services:
     depends_on:
       - wordpress
     build: ./requirements/nginx
-    image: nginx:notlatest
+    image: nginx:custom
     env_file: .env
     volumes:
       - wordpress:/var/www/wordpress
@@ -34,10 +36,13 @@ services:
     depends_on:
       - mariadb
     build: ./requirements/wordpress
-    image: wordpress:notlatest
+    image: wordpress:custom
     env_file: .env
     volumes:
       - wordpress:/var/www/wordpress
+      - /home/mel-atti/secrets/wp_admin_password.txt:/run/secrets/wp_admin_password
+      - /home/mel-atti/secrets/wp_user_password.txt:/run/secrets/wp_user_password
+      - /home/mel-atti/secrets/db_password.txt:/run/secrets/db_password
     restart: always
     expose:
       - "9000"

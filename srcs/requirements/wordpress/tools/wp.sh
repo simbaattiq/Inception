@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
+WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+
 mkdir -p /var/www/wordpress
 cd /var/www/wordpress
 
@@ -52,4 +57,4 @@ fi
 
 mkdir -p /run/php
 echo "Starting PHP-FPM..."
-php-fpm7.4 -F
+php-fpm8.2 -F
